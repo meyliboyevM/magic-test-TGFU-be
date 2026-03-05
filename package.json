@@ -1,0 +1,23 @@
+{
+  "name": "test-api-tgfu",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "ts-node src/main.ts",
+    "dev": "nodemon --exec ts-node src/main.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.16",
+    "@nestjs/core": "^11.1.16",
+    "@nestjs/platform-express": "^11.1.16",
+    "@prisma/client": "^6.19.2",
+    "dotenv": "^17.3.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "prisma": "^6.19.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
