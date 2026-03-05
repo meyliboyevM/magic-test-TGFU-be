@@ -1,8 +1,16 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2017",
+    "target": "es2019",
+    "rootDir": "./src",
+    "outDir": "./dist",
+
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  }
+    "emitDecoratorMetadata": true,
+
+    "esModuleInterop": true,
+    "strict": false
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "prisma.config.ts"]
 }
