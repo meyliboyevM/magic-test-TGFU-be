@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Menu {
+  id          String   @id
+  icon        String
+  title       String
+  description String?
+  bgColor     String?
+  order       Int      @default(0)
+  subjects    SubjectMenu[]
+}
+
+model TestType {
+  id                   String   @id
+  name                 String
+  description          String?
+  icon                 String?
+  order                Int      @default(0)
+  defaultQuestionCount Int      @default(0)
+  subjects             SubjectTestType[]
+}
+
+model Subject {
+  id               String    @id 
+  title            String
+  totalQuestions   Int
+  timeLimitMinutes Int
+  questionsPerTest Int
+  menus            SubjectMenu[]
+  test_types       SubjectTestType[]
+}
+
+// PIVOT TABLE - Subject va Menu o'rtasida bog'lanish
+model SubjectMenu {
+  subjectId       String
+  menuId          String
+  order           Int      @default(0)
+
+  subject         Subject  @relation(fields: [subjectId], references: [id])
+  menu            Menu     @relation(fields: [menuId], references: [id])
+
+  @@id([subjectId, menuId])
+}
+
+// PIVOT TABLE - Subject va TestType o'rtasida bog'lanish
+model SubjectTestType {
+  subjectId       String
+  testTypeId      String
+  order           Int      @default(0)
+  customName      String?
+  questionCount   Int      @default(0)
+
+  subject         Subject  @relation(fields: [subjectId], references: [id])
+  testType        TestType @relation(fields: [testTypeId], references: [id])
+
+  @@id([subjectId, testTypeId])
+}
+
+model Question {
+  id           Int      @id @default(autoincrement())
+  subjectId    String
+  question     String   @unique
+  options      Json
+  correctIndex Int
+
+}
