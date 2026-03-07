@@ -8,66 +8,97 @@ datasource db {
 }
 
 model Menu {
-  id          String   @id
-  icon        String
+  id          Int           @id @default(autoincrement())
+  key         String        @unique // Unique qo'shish tavsiya
   title       String
+  icon        String?
   description String?
   bgColor     String?
-  order       Int      @default(0)
+  type        String
+  disabled    Boolean       @default(false)
+  order       Int           @default(0)
+
+  // Relations
   subjects    SubjectMenu[]
 }
 
 model TestType {
-  id                   String   @id
-  name                 String
-  description          String?
-  icon                 String?
-  order                Int      @default(0)
-  defaultQuestionCount Int      @default(0)
-  subjects             SubjectTestType[]
+  id          Int               @id @default(autoincrement())
+  key         String            @unique // Unique qo'shish tavsiya
+  title       String
+  description String?
+  icon        String?
+  bgColor     String?
+  type        String
+  disabled    Boolean           @default(false)
+  order       Int               @default(0)
+
+  // Relations
+  subjects    SubjectTestType[]
 }
 
 model Subject {
-  id               String    @id 
+  id               String            @id // Agar custom ID ishlatsangiz
+  // YOKI avtomatik Int ID:
+  // id             Int               @id @default(autoincrement())
+
+  key              String            @unique
   title            String
+  icon             String?
+  bgColor          String?
   totalQuestions   Int
   timeLimitMinutes Int
   questionsPerTest Int
+
+  // Relations
   menus            SubjectMenu[]
-  test_types       SubjectTestType[]
+  testTypes        SubjectTestType[] // test_types emas, testTypes
+  questions        Question[]        // Question relation qo'shish
 }
 
 // PIVOT TABLE - Subject va Menu o'rtasida bog'lanish
 model SubjectMenu {
-  subjectId       String
-  menuId          String
-  order           Int      @default(0)
+  subjectId String
+  menuId    Int
+  order     Int    @default(0)
 
-  subject         Subject  @relation(fields: [subjectId], references: [id])
-  menu            Menu     @relation(fields: [menuId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+  menu    Menu    @relation(fields: [menuId], references: [id])
 
   @@id([subjectId, menuId])
+
+  // Indexes qo'shish (performance uchun)
+  @@index([menuId])
+  @@index([subjectId])
 }
 
 // PIVOT TABLE - Subject va TestType o'rtasida bog'lanish
 model SubjectTestType {
-  subjectId       String
-  testTypeId      String
-  order           Int      @default(0)
-  customName      String?
-  questionCount   Int      @default(0)
+  subjectId     String
+  testTypeId    Int
+  order         Int     @default(0)
+  customName    String?
+  questionCount Int     @default(0)
 
-  subject         Subject  @relation(fields: [subjectId], references: [id])
-  testType        TestType @relation(fields: [testTypeId], references: [id])
+  subject  Subject  @relation(fields: [subjectId], references: [id])
+  testType TestType @relation(fields: [testTypeId], references: [id])
 
   @@id([subjectId, testTypeId])
+
+  // Indexes qo'shish
+  @@index([testTypeId])
+  @@index([subjectId])
 }
 
 model Question {
-  id           Int      @id @default(autoincrement())
+  id           Int    @id @default(autoincrement())
   subjectId    String
-  question     String   @unique
-  options      Json
-  correctIndex Int
+  question     String @unique
+  options      Json   // JSON format: [{text: "A", isCorrect: false}, ...]
+  correctIndex Int    // 0-based index
 
+  // Relation
+  subject      Subject @relation(fields: [subjectId], references: [id])
+
+  @@index([subjectId])
 }

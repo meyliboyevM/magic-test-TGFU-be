@@ -54,7 +54,7 @@ export class SubjectsController {
     @Post(':subjectId/menus/:menuId')
     addMenu(
         @Param('subjectId') subjectId: string,
-        @Param('menuId') menuId: string,
+        @Param('menuId') menuId: number,
         @Body('order') order?: number
     ) {
         return this.subjectsService.addMenu(subjectId, menuId, order);
@@ -64,7 +64,7 @@ export class SubjectsController {
     @Delete(':subjectId/menus/:menuId')
     removeMenu(
         @Param('subjectId') subjectId: string,
-        @Param('menuId') menuId: string
+        @Param('menuId') menuId: number
     ) {
         return this.subjectsService.removeMenu(subjectId, menuId);
     }
@@ -73,7 +73,7 @@ export class SubjectsController {
     @Post(':subjectId/test-types/:testTypeId')
     addTestType(
         @Param('subjectId') subjectId: string,
-        @Param('testTypeId') testTypeId: string,
+        @Param('testTypeId') testTypeId: number,
         @Body('order') order?: number
     ) {
         return this.subjectsService.addTestType(subjectId, testTypeId, order);
@@ -83,7 +83,7 @@ export class SubjectsController {
     @Delete(':subjectId/test-types/:testTypeId')
     removeTestType(
         @Param('subjectId') subjectId: string,
-        @Param('testTypeId') testTypeId: string
+        @Param('testTypeId') testTypeId: number
     ) {
         return this.subjectsService.removeTestType(subjectId, testTypeId);
     }

@@ -1,32 +1,36 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SubjectsService = void 0;
 // src/modules/subjects/subjects.service.ts
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import {CreateSubjectDto, UpdateSubjectDto} from './dto/create-subject.dto';
-import {PrismaService} from "../../prisma/prisma.service";
-
-@Injectable()
-export class SubjectsService {
-    constructor(private prisma: PrismaService) {}
-
+const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../../prisma/prisma.service");
+let SubjectsService = class SubjectsService {
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
     // CREATE - Yangi subject yaratish
-    async create(createSubjectDto: CreateSubjectDto) {
+    async create(createSubjectDto) {
         const { menuIds, testTypeIds, ...subjectData } = createSubjectDto;
-
         // Subject mavjudligini tekshirish
         const existingSubject = await this.prisma.subject.findUnique({
             where: { id: subjectData.id },
         });
-
         if (existingSubject) {
-            throw new BadRequestException(
-                `Subject with id ${subjectData.id} already exists`,
-            );
+            throw new common_1.BadRequestException(`Subject with id ${subjectData.id} already exists`);
         }
-
         try {
             const subject = await this.prisma.subject.create({
                 data: {
                     ...subjectData,
-
                     // Menularni bog‘lash
                     menus: menuIds
                         ? {
@@ -36,7 +40,6 @@ export class SubjectsService {
                             })),
                         }
                         : undefined,
-
                     // Test turlarini bog‘lash
                     testTypes: testTypeIds
                         ? {
@@ -47,7 +50,6 @@ export class SubjectsService {
                         }
                         : undefined,
                 },
-
                 include: {
                     menus: {
                         include: {
@@ -61,33 +63,20 @@ export class SubjectsService {
                     },
                 },
             });
-
             return this.formatSubjectResponse(subject);
-
-        } catch (error) {
-
+        }
+        catch (error) {
             // Prisma foreign key xatosi
-            if (
-                error.code === 'P2003'
-            ) {
-                throw new BadRequestException(
-                    'Invalid menuIds or testTypeIds. Related record not found.',
-                );
+            if (error.code === 'P2003') {
+                throw new common_1.BadRequestException('Invalid menuIds or testTypeIds. Related record not found.');
             }
-
             // Prisma duplicate xatosi
-            if (
-                error.code === 'P2002'
-            ) {
-                throw new BadRequestException(
-                    'Subject already exists or unique constraint failed.',
-                );
+            if (error.code === 'P2002') {
+                throw new common_1.BadRequestException('Subject already exists or unique constraint failed.');
             }
-
             throw error;
         }
     }
-
     // GET ALL - Barcha subjectlarni olish
     async findAll() {
         const subjects = await this.prisma.subject.findMany({
@@ -107,12 +96,10 @@ export class SubjectsService {
             },
             orderBy: { id: 'asc' }
         });
-
         return subjects.map(subject => this.formatSubjectResponse(subject));
     }
-
     // GET ONE - Bitta subjectni olish
-    async findOne(id: string) {
+    async findOne(id) {
         const subject = await this.prisma.subject.findUnique({
             where: { id },
             include: {
@@ -130,27 +117,21 @@ export class SubjectsService {
                 }
             }
         });
-
         if (!subject) {
-            throw new NotFoundException(`Subject with id ${id} not found`);
+            throw new common_1.NotFoundException(`Subject with id ${id} not found`);
         }
-
         return this.formatSubjectResponse(subject);
     }
-
     // UPDATE - Subjectni yangilash
-    async update(id: string, updateSubjectDto: UpdateSubjectDto) {
+    async update(id, updateSubjectDto) {
         const { menuIds, testTypeIds, ...subjectData } = updateSubjectDto;
-
         // Subject mavjudligini tekshirish
         const existingSubject = await this.prisma.subject.findUnique({
             where: { id }
         });
-
         if (!existingSubject) {
-            throw new NotFoundException(`Subject with id ${id} not found`);
+            throw new common_1.NotFoundException(`Subject with id ${id} not found`);
         }
-
         // Subjectni yangilash va menular/test turlarini yangilash
         const subject = await this.prisma.$transaction(async (prisma) => {
             // Subject ma'lumotlarini yangilash
@@ -158,14 +139,12 @@ export class SubjectsService {
                 where: { id },
                 data: subjectData
             });
-
             // Agar menuIds berilgan bo'lsa, menularni yangilash
             if (menuIds) {
                 // Eski menularni o'chirish
                 await prisma.subjectMenu.deleteMany({
                     where: { subjectId: id }
                 });
-
                 // Yangi menularni qo'shish
                 if (menuIds.length > 0) {
                     await prisma.subjectMenu.createMany({
@@ -177,14 +156,12 @@ export class SubjectsService {
                     });
                 }
             }
-
             // Agar testTypeIds berilgan bo'lsa, test turlarini yangilash
             if (testTypeIds) {
                 // Eski test turlarini o'chirish
                 await prisma.subjectTestType.deleteMany({
                     where: { subjectId: id }
                 });
-
                 // Yangi test turlarini qo'shish
                 if (testTypeIds.length > 0) {
                     await prisma.subjectTestType.createMany({
@@ -196,7 +173,6 @@ export class SubjectsService {
                     });
                 }
             }
-
             // Yangilangan subjectni qaytarish
             return prisma.subject.findUnique({
                 where: { id },
@@ -212,10 +188,8 @@ export class SubjectsService {
                 }
             });
         });
-
         return this.formatSubjectResponse(subject);
     }
-
     // DELETE - Subjectni o'chirish
     // async remove(id: string) {
     //     // Subject mavjudligini tekshirish
@@ -269,36 +243,35 @@ export class SubjectsService {
     //
     //     return { message: `Subject with id ${id} deleted successfully` };
     // }
-
     // Helper function - subject responseni formatlash
-    private formatSubjectResponse(subject: any) {
+    formatSubjectResponse(subject) {
+        var _a, _b;
         return {
             id: subject.id,
             title: subject.title,
             totalQuestions: subject.totalQuestions,
             timeLimitMinutes: subject.timeLimitMinutes,
             questionsPerTest: subject.questionsPerTest,
-            menus: subject.menus?.map(sm => ({
+            menus: ((_a = subject.menus) === null || _a === void 0 ? void 0 : _a.map(sm => ({
                 id: sm.menu.id,
                 title: sm.menu.title,
                 icon: sm.menu.icon,
                 description: sm.menu.description,
                 bgColor: sm.menu.bgColor,
                 order: sm.order
-            })) || [],
-            test_types: subject.test_types?.map(st => ({
+            }))) || [],
+            test_types: ((_b = subject.test_types) === null || _b === void 0 ? void 0 : _b.map(st => ({
                 id: st.testType.id,
                 name: st.testType.name,
                 description: st.testType.description,
                 icon: st.testType.icon,
                 order: st.order,
                 questionCount: st.questionCount
-            })) || []
+            }))) || []
         };
     }
-
     // Subjectga menu qo'shish
-    async addMenu(subjectId: string, menuId: number, order?: number) {
+    async addMenu(subjectId, menuId, order) {
         const subjectMenu = await this.prisma.subjectMenu.create({
             data: {
                 subjectId,
@@ -309,12 +282,10 @@ export class SubjectsService {
                 menu: true
             }
         });
-
         return subjectMenu;
     }
-
     // Subjectdan menu o'chirish
-    async removeMenu(subjectId: string, menuId: number) {
+    async removeMenu(subjectId, menuId) {
         await this.prisma.subjectMenu.delete({
             where: {
                 subjectId_menuId: {
@@ -323,12 +294,10 @@ export class SubjectsService {
                 }
             }
         });
-
         return { message: 'Menu removed from subject' };
     }
-
     // Subjectga test type qo'shish
-    async addTestType(subjectId: string, testTypeId: number, order?: number) {
+    async addTestType(subjectId, testTypeId, order) {
         const subjectTestType = await this.prisma.subjectTestType.create({
             data: {
                 subjectId,
@@ -339,12 +308,10 @@ export class SubjectsService {
                 testType: true
             }
         });
-
         return subjectTestType;
     }
-
     // Subjectdan test type o'chirish
-    async removeTestType(subjectId: string, testTypeId: number) {
+    async removeTestType(subjectId, testTypeId) {
         await this.prisma.subjectTestType.delete({
             where: {
                 subjectId_testTypeId: {
@@ -353,7 +320,11 @@ export class SubjectsService {
                 }
             }
         });
-
         return { message: 'Test type removed from subject' };
     }
-}
+};
+exports.SubjectsService = SubjectsService;
+exports.SubjectsService = SubjectsService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+], SubjectsService);

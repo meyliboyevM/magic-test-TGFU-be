@@ -1,18 +1,19 @@
 // src/modules/menus/dto/create-menu.dto.ts
-import { IsString, IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator';
+import {IsString, IsNotEmpty, IsNumber, IsOptional, Min, IsBoolean} from 'class-validator';
 
 export class CreateMenuDto {
-    @IsString()
-    @IsNotEmpty()
-    id: string; // "kirish-menu", "algoritm-menu"
 
     @IsString()
     @IsNotEmpty()
-    icon: string;
+    key: string;
 
     @IsString()
     @IsNotEmpty()
     title: string;
+
+    @IsString()
+    @IsOptional()
+    icon?: string;
 
     @IsString()
     @IsOptional()
@@ -22,10 +23,18 @@ export class CreateMenuDto {
     @IsOptional()
     bgColor?: string;
 
+    @IsString()
+    @IsNotEmpty()
+    type: string;
+
+    @IsBoolean()
+    @IsNotEmpty()
+    disabled: boolean = false;
+
     @IsNumber()
-    @IsOptional()
+    @IsNotEmpty()
     @Min(0)
-    order?: number;
+    order: number;
 }
 
 

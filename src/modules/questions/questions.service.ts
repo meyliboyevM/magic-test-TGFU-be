@@ -2,7 +2,7 @@
 import { Injectable, BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { Prisma } from '@prisma/client';
-import {PrismaService} from "../../prisma/prisma.service.";
+import {PrismaService} from "../../prisma/prisma.service";
 
 @Injectable()
 export class QuestionsService {

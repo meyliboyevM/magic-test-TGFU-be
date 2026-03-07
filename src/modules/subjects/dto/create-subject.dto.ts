@@ -4,11 +4,23 @@ import { IsString, IsNotEmpty, IsNumber, IsOptional, IsArray } from 'class-valid
 export class CreateSubjectDto {
     @IsString()
     @IsNotEmpty()
-    id: string; // "ai", "math", "physics"
+    id: string;
+
+    @IsString()
+    @IsNotEmpty()
+    key: string;
 
     @IsString()
     @IsNotEmpty()
     title: string;
+
+    @IsString()
+    @IsNotEmpty()
+    icon: string;
+
+    @IsString()
+    @IsOptional()
+    bgColor?: string;
 
     @IsNumber()
     @IsNotEmpty()
@@ -24,11 +36,11 @@ export class CreateSubjectDto {
 
     @IsArray()
     @IsOptional()
-    menuIds?: string[]; // ["kirish-menu", "algoritm-menu"]
+    menuIds?: number[]; // ["kirish-menu", "algoritm-menu"]
 
     @IsArray()
     @IsOptional()
-    testTypeIds?: string[]; // ["kirish-testi", "asosiy-test"]
+    testTypeIds?: number[]; // ["kirish-testi", "asosiy-test"]
 }
 
 // src/modules/subjects/dto/update-subject.dto.ts

@@ -48,28 +48,28 @@ export class MenusController {
     }
 
     // GET /menus/by-ids?ids=id1,id2,id3 - Bir nechta ID lar bo'yicha olish
-    @Get('by-ids')
-    findByIds(@Query('ids') ids: string) {
-        const idArray = ids.split(',').map(id => id.trim());
-        return this.menusService.findByIds(idArray);
-    }
+    // @Get('by-ids')
+    // findByIds(@Query('ids') ids: string) {
+    //     const idArray = ids.split(',').map(id => id.trim());
+    //     return this.menusService.findByIds(idArray);
+    // }
 
     // GET /menus/:id - Bitta menuni olish
     @Get(':id')
-    findOne(@Param('id') id: string) {
+    findOne(@Param('id') id: number) {
         return this.menusService.findOne(id);
     }
 
     // PATCH /menus/:id - Menuni yangilash
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateMenuDto: UpdateMenuDto) {
+    update(@Param('id') id: number, @Body() updateMenuDto: UpdateMenuDto) {
         return this.menusService.update(id, updateMenuDto);
     }
 
     // DELETE /menus/:id - Menuni o'chirish
     @Delete(':id')
     @HttpCode(HttpStatus.OK)
-    remove(@Param('id') id: string) {
+    remove(@Param('id') id: number) {
         return this.menusService.remove(id);
     }
 }

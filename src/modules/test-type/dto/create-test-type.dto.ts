@@ -1,14 +1,14 @@
-// src/modules/test-types/dto/create-test-type.dto.ts
-import { IsString, IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator';
+import {IsString, IsNotEmpty, IsNumber, IsOptional, Min, IsBoolean} from 'class-validator';
 
 export class CreateTestTypeDto {
-    @IsString()
-    @IsNotEmpty()
-    id: string; // "kirish-testi", "asosiy-test"
 
     @IsString()
     @IsNotEmpty()
-    name: string;
+    key: string;
+
+    @IsString()
+    @IsNotEmpty()
+    title: string;
 
     @IsString()
     @IsOptional()
@@ -18,15 +18,23 @@ export class CreateTestTypeDto {
     @IsOptional()
     icon?: string;
 
-    @IsNumber()
+    @IsString()
     @IsOptional()
-    @Min(0)
-    order?: number;
+    bgColor?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    type: string;
+
+    @IsBoolean()
+    @IsNotEmpty()
+    disabled: boolean = false;
 
     @IsNumber()
-    @IsOptional()
+    @IsNotEmpty()
     @Min(0)
-    defaultQuestionCount?: number;
+    order: number;
+
 }
 
 export class UpdateTestTypeDto extends CreateTestTypeDto {}

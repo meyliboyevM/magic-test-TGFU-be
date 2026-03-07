@@ -60,11 +60,11 @@ export class TestTypesController {
     }
 
     // GET /test-types/by-ids?ids=id1,id2,id3 - Bir nechta ID lar bo'yicha
-    @Get('by-ids')
-    findByIds(@Query('ids') ids: string) {
-        const idArray = ids.split(',').map(id => id.trim());
-        return this.testTypesService.findByIds(idArray);
-    }
+    // @Get('by-ids')
+    // findByIds(@Query('ids') ids: number) {
+    //     const idArray = ids.split(',').map(id => id.trim());
+    //     return this.testTypesService.findByIds(idArray);
+    // }
 
     // GET /test-types/:id - Bitta test turni olish
     // @Get(':id')
@@ -74,7 +74,7 @@ export class TestTypesController {
 
     // PATCH /test-types/:id - Test turni yangilash
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateTestTypeDto: UpdateTestTypeDto) {
+    update(@Param('id') id: number, @Body() updateTestTypeDto: UpdateTestTypeDto) {
         return this.testTypesService.update(id, updateTestTypeDto);
     }
 
