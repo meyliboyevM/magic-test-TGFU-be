@@ -37,11 +37,14 @@ const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
+const common_1 = require("./common");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.enableCors({
-        origin: '*'
-    });
+    app.enableCors({ origin: '*' });
+    // Custom ValidationPipe ni ishlatish
+    app.useGlobalPipes(new common_1.CustomValidationPipe());
+    // Global Exception Filter ni ishlatish
+    app.useGlobalFilters(new common_1.AllExceptionsFilter());
     const port = process.env.PORT || 3000;
     await app.listen(port);
     console.log(`Application is running on: http://localhost:${port}`);
