@@ -37,6 +37,10 @@ let SubjectsController = class SubjectsController {
     update(id, updateSubjectDto) {
         return this.subjectsService.update(id, updateSubjectDto);
     }
+    // PATCH /subjects/:id - Subjectni yangilash
+    remove(id) {
+        return this.subjectsService.remove(id);
+    }
     // DELETE /subjects/:id - Subjectni o'chirish
     // @Delete(':id')
     // @HttpCode(HttpStatus.NO_CONTENT)
@@ -90,6 +94,13 @@ __decorate([
     __metadata("design:paramtypes", [String, create_subject_dto_1.UpdateSubjectDto]),
     __metadata("design:returntype", void 0)
 ], SubjectsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], SubjectsController.prototype, "remove", null);
 __decorate([
     (0, common_1.Post)(':subjectId/menus/:menuId'),
     __param(0, (0, common_1.Param)('subjectId')),

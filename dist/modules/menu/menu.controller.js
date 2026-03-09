@@ -96,7 +96,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, create_menu_dto_1.UpdateMenuDto]),
+    __metadata("design:paramtypes", [Number, Array]),
     __metadata("design:returntype", void 0)
 ], MenusController.prototype, "update", null);
 __decorate([

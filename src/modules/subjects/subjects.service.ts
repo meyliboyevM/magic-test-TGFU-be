@@ -7,11 +7,9 @@ import {PrismaService} from "../../prisma/prisma.service";
 export class SubjectsService {
     constructor(private prisma: PrismaService) {}
 
-    // CREATE - Yangi subject yaratish
     async create(createSubjectDto: CreateSubjectDto) {
         const { menuIds, testTypeIds, ...subjectData } = createSubjectDto;
 
-        // Subject mavjudligini tekshirish
         const existingSubject = await this.prisma.subject.findUnique({
             where: { id: subjectData.id },
         });
@@ -88,7 +86,6 @@ export class SubjectsService {
         }
     }
 
-    // GET ALL - Barcha subjectlarni olish
     async findAll() {
         const subjects = await this.prisma.subject.findMany({
             include: {
@@ -108,10 +105,15 @@ export class SubjectsService {
             orderBy: { id: 'asc' }
         });
 
-        return subjects.map(subject => this.formatSubjectResponse(subject));
+        return {
+            success: true,
+            total: subjects.map(subject => this.formatSubjectResponse(subject)).length,
+            data: subjects.map(subject => this.formatSubjectResponse(subject))
+        };
+
+        // return subjects.map(subject => this.formatSubjectResponse(subject));
     }
 
-    // GET ONE - Bitta subjectni olish
     async findOne(id: string) {
         const subject = await this.prisma.subject.findUnique({
             where: { id },
@@ -138,7 +140,6 @@ export class SubjectsService {
         return this.formatSubjectResponse(subject);
     }
 
-    // UPDATE - Subjectni yangilash
     async update(id: string, updateSubjectDto: UpdateSubjectDto) {
         const { menuIds, testTypeIds, ...subjectData } = updateSubjectDto;
 
@@ -234,7 +235,7 @@ export class SubjectsService {
     //     if (existingSubject.questions.length > 0) {
     //         await this.prisma.$transaction([
     //             // Avval optionlarni o'chirish
-    //             this.prisma.option.deleteMany({
+    //             this.prisma.options.deleteMany({
     //                 where: {
     //                     question: {
     //                         subjectId: id
@@ -269,30 +270,64 @@ export class SubjectsService {
     //
     //     return { message: `Subject with id ${id} deleted successfully` };
     // }
+    async remove(id: string) {
+        // Subjectni key orqali qidirish
+        const existingSubject = await this.prisma.subject.findFirst({
+            where: {
+                OR: [
+                    { id: id },
+                    { key: id }  // Agar key fieldi bo'lsa
+                ]
+            }
+        });
+
+        if (!existingSubject) {
+            throw new NotFoundException(`Subject with id/key ${id} not found`);
+        }
+
+        // Subjectni o'chirish
+        await this.prisma.subject.delete({
+            where: { id: existingSubject.id }  // UUID bilan o'chirish
+        });
+
+        return {
+            success: true,
+            message: `Subject with id ${id} deleted successfully`
+        };
+    }
 
     // Helper function - subject responseni formatlash
     private formatSubjectResponse(subject: any) {
         return {
             id: subject.id,
+            key: subject.key,
             title: subject.title,
+            icon: subject.icon,
+            bgColor: subject.bgColor,
             totalQuestions: subject.totalQuestions,
             timeLimitMinutes: subject.timeLimitMinutes,
             questionsPerTest: subject.questionsPerTest,
             menus: subject.menus?.map(sm => ({
                 id: sm.menu.id,
+                key: sm.menu.key,
+                type: sm.menu.type,
                 title: sm.menu.title,
-                icon: sm.menu.icon,
                 description: sm.menu.description,
+                icon: sm.menu.icon,
                 bgColor: sm.menu.bgColor,
+                disabled: sm.menu.disabled,
                 order: sm.order
             })) || [],
-            test_types: subject.test_types?.map(st => ({
+            testTypes: subject.testTypes?.map(st => ({
                 id: st.testType.id,
-                name: st.testType.name,
+                key: st.testType.key,
+                type: st.testType.type,
+                title: st.testType.title,
                 description: st.testType.description,
                 icon: st.testType.icon,
+                bgColor: st.bgColor,
+                disabled: st.disabled,
                 order: st.order,
-                questionCount: st.questionCount
             })) || []
         };
     }

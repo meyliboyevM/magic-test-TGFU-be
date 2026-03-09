@@ -71,7 +71,7 @@ export class MenusService {
     }
 
     // UPDATE - Menuni yangilash
-    async update(id: number, updateMenuDto: UpdateMenuDto) {
+    async update(id: number, updateMenuDto: any[]) {
         // Menu mavjudligini tekshirish
         const existingMenu = await this.prisma.menu.findUnique({
             where: { id }

@@ -62,7 +62,7 @@ export class MenusController {
 
     // PATCH /menus/:id - Menuni yangilash
     @Patch(':id')
-    update(@Param('id') id: number, @Body() updateMenuDto: UpdateMenuDto) {
+    update(@Param('id') id: number, @Body() updateMenuDto: any[]) {
         return this.menusService.update(id, updateMenuDto);
     }
 

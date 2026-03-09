@@ -43,6 +43,12 @@ export class SubjectsController {
         return this.subjectsService.update(id, updateSubjectDto);
     }
 
+    // PATCH /subjects/:id - Subjectni yangilash
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.subjectsService.remove(id);
+    }
+
     // DELETE /subjects/:id - Subjectni o'chirish
     // @Delete(':id')
     // @HttpCode(HttpStatus.NO_CONTENT)

@@ -17,10 +17,8 @@ let SubjectsService = class SubjectsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    // CREATE - Yangi subject yaratish
     async create(createSubjectDto) {
         const { menuIds, testTypeIds, ...subjectData } = createSubjectDto;
-        // Subject mavjudligini tekshirish
         const existingSubject = await this.prisma.subject.findUnique({
             where: { id: subjectData.id },
         });
@@ -77,7 +75,6 @@ let SubjectsService = class SubjectsService {
             throw error;
         }
     }
-    // GET ALL - Barcha subjectlarni olish
     async findAll() {
         const subjects = await this.prisma.subject.findMany({
             include: {
@@ -96,9 +93,13 @@ let SubjectsService = class SubjectsService {
             },
             orderBy: { id: 'asc' }
         });
-        return subjects.map(subject => this.formatSubjectResponse(subject));
+        return {
+            success: true,
+            total: subjects.map(subject => this.formatSubjectResponse(subject)).length,
+            data: subjects.map(subject => this.formatSubjectResponse(subject))
+        };
+        // return subjects.map(subject => this.formatSubjectResponse(subject));
     }
-    // GET ONE - Bitta subjectni olish
     async findOne(id) {
         const subject = await this.prisma.subject.findUnique({
             where: { id },
@@ -122,7 +123,6 @@ let SubjectsService = class SubjectsService {
         }
         return this.formatSubjectResponse(subject);
     }
-    // UPDATE - Subjectni yangilash
     async update(id, updateSubjectDto) {
         const { menuIds, testTypeIds, ...subjectData } = updateSubjectDto;
         // Subject mavjudligini tekshirish
@@ -208,7 +208,7 @@ let SubjectsService = class SubjectsService {
     //     if (existingSubject.questions.length > 0) {
     //         await this.prisma.$transaction([
     //             // Avval optionlarni o'chirish
-    //             this.prisma.option.deleteMany({
+    //             this.prisma.options.deleteMany({
     //                 where: {
     //                     question: {
     //                         subjectId: id
@@ -243,30 +243,61 @@ let SubjectsService = class SubjectsService {
     //
     //     return { message: `Subject with id ${id} deleted successfully` };
     // }
+    async remove(id) {
+        // Subjectni key orqali qidirish
+        const existingSubject = await this.prisma.subject.findFirst({
+            where: {
+                OR: [
+                    { id: id },
+                    { key: id } // Agar key fieldi bo'lsa
+                ]
+            }
+        });
+        if (!existingSubject) {
+            throw new common_1.NotFoundException(`Subject with id/key ${id} not found`);
+        }
+        // Subjectni o'chirish
+        await this.prisma.subject.delete({
+            where: { id: existingSubject.id } // UUID bilan o'chirish
+        });
+        return {
+            success: true,
+            message: `Subject with id ${id} deleted successfully`
+        };
+    }
     // Helper function - subject responseni formatlash
     formatSubjectResponse(subject) {
         var _a, _b;
         return {
             id: subject.id,
+            key: subject.key,
             title: subject.title,
+            icon: subject.icon,
+            bgColor: subject.bgColor,
             totalQuestions: subject.totalQuestions,
             timeLimitMinutes: subject.timeLimitMinutes,
             questionsPerTest: subject.questionsPerTest,
             menus: ((_a = subject.menus) === null || _a === void 0 ? void 0 : _a.map(sm => ({
                 id: sm.menu.id,
+                key: sm.menu.key,
+                type: sm.menu.type,
                 title: sm.menu.title,
-                icon: sm.menu.icon,
                 description: sm.menu.description,
+                icon: sm.menu.icon,
                 bgColor: sm.menu.bgColor,
+                disabled: sm.menu.disabled,
                 order: sm.order
             }))) || [],
-            test_types: ((_b = subject.test_types) === null || _b === void 0 ? void 0 : _b.map(st => ({
+            testTypes: ((_b = subject.testTypes) === null || _b === void 0 ? void 0 : _b.map(st => ({
                 id: st.testType.id,
-                name: st.testType.name,
+                key: st.testType.key,
+                type: st.testType.type,
+                title: st.testType.title,
                 description: st.testType.description,
                 icon: st.testType.icon,
+                bgColor: st.bgColor,
+                disabled: st.disabled,
                 order: st.order,
-                questionCount: st.questionCount
             }))) || []
         };
     }
